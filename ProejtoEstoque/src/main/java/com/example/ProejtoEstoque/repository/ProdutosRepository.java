@@ -10,7 +10,7 @@ import com.example.ProejtoEstoque.model.Produtos;
 @Repository
 public interface ProdutosRepository extends JpaRepository<Produtos, Long> {
 
-    // O spring gera uma query na criação do arquivo para buscar por categoria
+    // O Spring Data JPA gera automaticamente a consulta para buscar produtos pelo ID da categoria
     List<Produtos> findByCategoriaId(Long categoriaId);
 
 }
