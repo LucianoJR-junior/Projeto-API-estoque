@@ -1,0 +1,16 @@
+C:\Users\JUNINPIKAFINA\Documents\ProejtoEstoque\Projeto-API-estoque-main\ProejtoEstoque\src\main\java\com\example\ProejtoEstoque\controller\CategoriasController.java
+C:\Users\JUNINPIKAFINA\Documents\ProejtoEstoque\Projeto-API-estoque-main\ProejtoEstoque\src\main\java\com\example\ProejtoEstoque\controller\ProdutosController.java
+C:\Users\JUNINPIKAFINA\Documents\ProejtoEstoque\Projeto-API-estoque-main\ProejtoEstoque\src\main\java\com\example\ProejtoEstoque\dto\CategoriasRequestDto.java
+C:\Users\JUNINPIKAFINA\Documents\ProejtoEstoque\Projeto-API-estoque-main\ProejtoEstoque\src\main\java\com\example\ProejtoEstoque\dto\CategoriasResponseDto.java
+C:\Users\JUNINPIKAFINA\Documents\ProejtoEstoque\Projeto-API-estoque-main\ProejtoEstoque\src\main\java\com\example\ProejtoEstoque\dto\ProdutosRequestDto.java
+C:\Users\JUNINPIKAFINA\Documents\ProejtoEstoque\Projeto-API-estoque-main\ProejtoEstoque\src\main\java\com\example\ProejtoEstoque\dto\ProdutosResponseDto.java
+C:\Users\JUNINPIKAFINA\Documents\ProejtoEstoque\Projeto-API-estoque-main\ProejtoEstoque\src\main\java\com\example\ProejtoEstoque\exception\ErroResposta.java
+C:\Users\JUNINPIKAFINA\Documents\ProejtoEstoque\Projeto-API-estoque-main\ProejtoEstoque\src\main\java\com\example\ProejtoEstoque\exception\GlobalExceptionHandler.java
+C:\Users\JUNINPIKAFINA\Documents\ProejtoEstoque\Projeto-API-estoque-main\ProejtoEstoque\src\main\java\com\example\ProejtoEstoque\exception\ResourceNotFoundException.java
+C:\Users\JUNINPIKAFINA\Documents\ProejtoEstoque\Projeto-API-estoque-main\ProejtoEstoque\src\main\java\com\example\ProejtoEstoque\model\Categorias.java
+C:\Users\JUNINPIKAFINA\Documents\ProejtoEstoque\Projeto-API-estoque-main\ProejtoEstoque\src\main\java\com\example\ProejtoEstoque\model\Produtos.java
+C:\Users\JUNINPIKAFINA\Documents\ProejtoEstoque\Projeto-API-estoque-main\ProejtoEstoque\src\main\java\com\example\ProejtoEstoque\ProejtoEstoqueApplication.java
+C:\Users\JUNINPIKAFINA\Documents\ProejtoEstoque\Projeto-API-estoque-main\ProejtoEstoque\src\main\java\com\example\ProejtoEstoque\repository\CategoriasRepository.java
+C:\Users\JUNINPIKAFINA\Documents\ProejtoEstoque\Projeto-API-estoque-main\ProejtoEstoque\src\main\java\com\example\ProejtoEstoque\repository\ProdutosRepository.java
+C:\Users\JUNINPIKAFINA\Documents\ProejtoEstoque\Projeto-API-estoque-main\ProejtoEstoque\src\main\java\com\example\ProejtoEstoque\service\CategoriasService.java
+C:\Users\JUNINPIKAFINA\Documents\ProejtoEstoque\Projeto-API-estoque-main\ProejtoEstoque\src\main\java\com\example\ProejtoEstoque\service\ProdutosService.java

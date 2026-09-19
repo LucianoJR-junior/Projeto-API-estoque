@@ -1,0 +1,14 @@
+com\example\ProejtoEstoque\ProejtoEstoqueApplication.class
+com\example\ProejtoEstoque\model\Categorias.class
+com\example\ProejtoEstoque\exception\ErroResposta.class
+com\example\ProejtoEstoque\controller\CategoriasController.class
+com\example\ProejtoEstoque\service\CategoriasService.class
+com\example\ProejtoEstoque\dto\ProdutosResponseDto.class
+com\example\ProejtoEstoque\repository\ProdutosRepository.class
+com\example\ProejtoEstoque\model\Produtos.class
+com\example\ProejtoEstoque\dto\CategoriasResponseDto.class
+com\example\ProejtoEstoque\repository\CategoriasRepository.class
+com\example\ProejtoEstoque\dto\CategoriasRequestDto.class
+com\example\ProejtoEstoque\exception\GlobalExceptionHandler.class
+com\example\ProejtoEstoque\exception\ResourceNotFoundException.class
+com\example\ProejtoEstoque\dto\ProdutosRequestDto.class
