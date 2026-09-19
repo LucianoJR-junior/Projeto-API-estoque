@@ -1,10 +1,10 @@
 package com.example.ProejtoEstoque.service;
 
+import com.example.ProejtoEstoque.exception.ResourceNotFoundException;
 import org.springframework.stereotype.Service;
 import com.example.ProejtoEstoque.repository.CategoriasRepository;
 import com.example.ProejtoEstoque.dto.CategoriasRequestDto;
 import com.example.ProejtoEstoque.dto.CategoriasResponseDto;
-import com.example.ProejtoEstoque.exception.ResourceNotFoundException;
 import com.example.ProejtoEstoque.model.Categorias;
 import java.util.List;
 
@@ -41,7 +41,9 @@ public class CategoriasService {
     public CategoriasResponseDto buscarPorId(Long id) {
 
         Categorias categoria = categoriasRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Categoria não encontrada com o id: " + id));
+                .orElseThrow(() ->
+                        new ResourceNotFoundException(
+                                "Categoria não encontrada com o ID: " + id));
 
         return new CategoriasResponseDto(categoria);
     }
@@ -49,7 +51,9 @@ public class CategoriasService {
     public CategoriasResponseDto atualizar(Long id, CategoriasRequestDto dto) {
 
         Categorias categoria = categoriasRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Categoria não encontrada com o id: " + id));
+                .orElseThrow(() ->
+                        new ResourceNotFoundException(
+                                "Categoria não encontrada com o ID: " + id));
 
         categoria.setNome(dto.getNome());
         categoria.setDescricao(dto.getDescricao());
@@ -62,7 +66,9 @@ public class CategoriasService {
     public void excluir(Long id) {
 
         Categorias categoria = categoriasRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Categoria não encontrada com o id: " + id));
+                .orElseThrow(() ->
+                        new ResourceNotFoundException(
+                                "Categoria não encontrada com o ID: " + id));
 
         categoriasRepository.delete(categoria);
     }
