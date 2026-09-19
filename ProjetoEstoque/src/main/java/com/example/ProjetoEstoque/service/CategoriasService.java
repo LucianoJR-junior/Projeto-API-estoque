@@ -1,11 +1,12 @@
-package com.example.ProejtoEstoque.service;
+package com.example.ProjetoEstoque.service;
 
-import com.example.ProejtoEstoque.exception.ResourceNotFoundException;
+import com.example.ProjetoEstoque.exception.ResourceNotFoundException;
 import org.springframework.stereotype.Service;
-import com.example.ProejtoEstoque.repository.CategoriasRepository;
-import com.example.ProejtoEstoque.dto.CategoriasRequestDto;
-import com.example.ProejtoEstoque.dto.CategoriasResponseDto;
-import com.example.ProejtoEstoque.model.Categorias;
+import com.example.ProjetoEstoque.repository.CategoriasRepository;
+import com.example.ProjetoEstoque.dto.CategoriasRequestDto;
+import com.example.ProjetoEstoque.dto.CategoriasResponseDto;
+import com.example.ProjetoEstoque.model.Categorias;
+
 import java.util.List;
 
 @Service
