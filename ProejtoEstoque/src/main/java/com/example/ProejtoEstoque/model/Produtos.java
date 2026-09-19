@@ -4,7 +4,7 @@ import jakarta.persistence.*;
 
 @Entity
 @Table(name = "produtos")
-public class Produtos  {
+public class Produtos {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -26,32 +26,54 @@ public class Produtos  {
     @JoinColumn(name = "categoria_id")
     private Categorias categoria;
 
-    public Produtos(long id, String nome) {
+    public Produtos() {
+    }
+
+    public long getId() {
+        return id;
+    }
+
+    public void setId(long id) {
         this.id = id;
+    }
+
+    public String getNome() {
+        return nome;
+    }
+
+    public void setNome(String nome) {
         this.nome = nome;
     }
 
-    public void setId(long id) {this.id = id;}
+    public String getDescricao() {
+        return descricao;
+    }
 
-    public void setId(int id) {this.id = id;}
+    public void setDescricao(String descricao) {
+        this.descricao = descricao;
+    }
 
-    public String getNome() {return nome;}
+    public double getPreco() {
+        return preco;
+    }
 
-    public void setNome(String nome) {this.nome = nome;}
+    public void setPreco(double preco) {
+        this.preco = preco;
+    }
 
-    public String getDescricao() {return descricao;}
+    public int getQuantidadeEstoque() {
+        return quantidadeEstoque;
+    }
 
-    public void setDescricao(String descricao) {this.descricao = descricao;}
+    public void setQuantidadeEstoque(int quantidadeEstoque) {
+        this.quantidadeEstoque = quantidadeEstoque;
+    }
 
-    public double getPreco() {return preco;}
+    public Categorias getCategoria() {
+        return categoria;
+    }
 
-    public void setPreco(double preco) {this.preco = preco;}
-
-    public int getQuantidadeEstoque() {return quantidadeEstoque;}
-
-    public void setQuantidadeEstoque(int quantidadeEstoque) {this.quantidadeEstoque = quantidadeEstoque;}
-
-    public Categorias getCategoria() {return categoria;}
-
-    public void setCategoria(Categorias categoria) {this.categoria = categoria;}
+    public void setCategoria(Categorias categoria) {
+        this.categoria = categoria;
+    }
 }

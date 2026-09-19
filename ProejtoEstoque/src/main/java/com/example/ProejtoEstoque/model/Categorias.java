@@ -17,6 +17,13 @@ public class Categorias {
     @Column(length = 100, nullable = false)
     private String descricao;
 
+    public long getId() {
+        return id;
+    }
+
+    public void setId(long id) {
+        this.id = id;
+    }
 
     public String getNome() {
         return nome;
@@ -26,14 +33,6 @@ public class Categorias {
         this.nome = nome;
     }
 
-    public void setId(long id) {
-        this.id = id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
     public String getDescricao() {
         return descricao;
     }
@@ -41,4 +40,5 @@ public class Categorias {
     public void setDescricao(String descricao) {
         this.descricao = descricao;
     }
+
 }
