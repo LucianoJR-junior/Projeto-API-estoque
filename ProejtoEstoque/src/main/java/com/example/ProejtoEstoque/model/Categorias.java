@@ -17,6 +17,9 @@ public class Categorias {
     @Column(length = 100, nullable = false)
     private String descricao;
 
+    public Categorias() {
+    }
+
     public long getId() {
         return id;
     }
