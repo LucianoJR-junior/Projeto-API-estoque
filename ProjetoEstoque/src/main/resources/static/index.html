@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Catálogo de Produtos</title>
+    <!-- CSS do Bootstrap 5 via CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        #log { white-space: pre-wrap; font-size: .85rem; max-height: 260px; overflow: auto; }
+        .estoque-input { width: 70px; }
+    </style>
+</head>
+<body class="bg-light">
+
+<div class="container py-5">
+    <h2 class="mb-4 text-center">Catálogo de Produtos e Categorias com Estoque</h2>
+
+    <!-- ===================== CATEGORIAS ===================== -->
+    <h4 class="mb-3">Categorias</h4>
+    <div class="row g-4 mb-5">
+        <!-- Form de Cadastro/Edição (POST / PUT) -->
+        <div class="col-md-5">
+            <div class="card shadow-sm">
+                <div class="card-header fw-bold" id="tituloFormCategoria">
+                    Cadastrar Nova Categoria
+                </div>
+                <div class="card-body">
+                    <form id="formCategoria" novalidate>
+                        <input type="hidden" id="categoriaIdEdicao">
+                        <div class="mb-3">
+                            <label for="catNome" class="form-label">Nome</label>
+                            <input type="text" id="catNome" class="form-control" placeholder="Ex: Informática">
+                        </div>
+                        <div class="mb-3">
+                            <label for="catDescricao" class="form-label">Descrição</label>
+                            <input type="text" id="catDescricao" class="form-control" placeholder="Ex: Periféricos e acessórios">
+                        </div>
+                        <button type="submit" class="btn btn-dark w-100" id="btnSalvarCategoria">Salvar Categoria (POST)</button>
+                        <button type="button" class="btn btn-outline-secondary w-100 mt-2 d-none" id="btnCancelarCategoria"
+                                onclick="cancelarEdicaoCategoria()">Cancelar edição</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tabela de Listagem (GET) -->
+        <div class="col-md-7">
+            <div class="card shadow-sm">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <span>Categorias Cadastradas</span>
+                    <button class="btn btn-sm btn-outline-dark" onclick="carregarCategorias()">Atualizar (GET)</button>
+                </div>
+                <div class="card-body p-0">
+                    <table class="table table-striped mb-0">
+                        <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Nome</th>
+                            <th>Descrição</th>
+                            <th class="text-end">Ações</th>
+                        </tr>
+                        </thead>
+                        <tbody id="tabelaCategorias">
+                        <!-- Preenchido via JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===================== PRODUTOS ===================== -->
+    <h4 class="mb-3">Produtos</h4>
+    <div class="row g-4">
+        <!-- Form de Cadastro/Edição (POST / PUT) -->
+        <div class="col-md-5">
+            <div class="card shadow-sm">
+                <div class="card-header fw-bold" id="tituloFormProduto">
+                    Cadastrar Novo Produto
+                </div>
+                <div class="card-body">
+                    <form id="formProduto" novalidate>
+                        <input type="hidden" id="produtoIdEdicao">
+                        <div class="mb-3">
+                            <label for="nome" class="form-label">Nome do Produto</label>
+                            <input type="text" id="nome" class="form-control" placeholder="Ex: Teclado Mecânico">
+                        </div>
+                        <div class="mb-3">
+                            <label for="descricao" class="form-label">Descrição</label>
+                            <input type="text" id="descricao" class="form-control" placeholder="Ex: Switch azul, ABNT2">
+                        </div>
+                        <div class="row">
+                            <div class="col-6 mb-3">
+                                <label for="preco" class="form-label">Preço (R$)</label>
+                                <input type="number" step="0.01" id="preco" class="form-control" placeholder="Ex: 250.00">
+                            </div>
+                            <div class="col-6 mb-3">
+                                <label for="quantidadeEstoque" class="form-label">Estoque</label>
+                                <input type="number" id="quantidadeEstoque" class="form-control" placeholder="Ex: 10">
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="categoriaId" class="form-label">Categoria</label>
+                            <select id="categoriaId" class="form-select">
+                                <option value="">Selecione...</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-dark w-100" id="btnSalvarProduto">Salvar Produto (POST)</button>
+                        <button type="button" class="btn btn-outline-secondary w-100 mt-2 d-none" id="btnCancelarProduto"
+                                onclick="cancelarEdicaoProduto()">Cancelar edição</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tabela de Listagem com filtros (GET) -->
+        <div class="col-md-7">
+            <div class="card shadow-sm">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <span>Produtos Cadastrados</span>
+                    <button class="btn btn-sm btn-outline-dark" onclick="carregarProdutos()">Atualizar (GET)</button>
+                </div>
+                <div class="card-body border-bottom">
+                    <form id="formFiltro" class="row g-2">
+                        <div class="col-sm-5">
+                            <select id="filtroCategoria" class="form-select form-select-sm">
+                                <option value="">Todas as categorias</option>
+                            </select>
+                        </div>
+                        <div class="col-sm-4">
+                            <input type="text" id="filtroNome" class="form-control form-control-sm" placeholder="Buscar por nome">
+                        </div>
+                        <div class="col-sm-3">
+                            <button type="submit" class="btn btn-sm btn-outline-dark w-100">Filtrar</button>
+                        </div>
+                    </form>
+                </div>
+                <div class="card-body p-0">
+                    <table class="table table-striped mb-0 align-middle">
+                        <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Nome</th>
+                            <th>Categoria</th>
+                            <th>Preço (R$)</th>
+                            <th>Estoque</th>
+                            <th>Movimentar (PATCH)</th>
+                            <th class="text-end">Ações</th>
+                        </tr>
+                        </thead>
+                        <tbody id="tabelaProdutos">
+                        <!-- Preenchido via JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===================== LOG DA API ===================== -->
+    <div class="card shadow-sm mt-5">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <span>Última resposta da API <span id="logStatus" class="badge bg-secondary ms-2"></span></span>
+            <button class="btn btn-sm btn-outline-dark" onclick="limparLog()">Limpar</button>
+        </div>
+        <div class="card-body">
+            <pre id="log" class="mb-0 text-muted">Nenhuma requisição ainda.</pre>
+        </div>
+    </div>
+</div>
+
+<!-- JavaScript Integrando com a API REST -->
+<script>
+    const API_CATEGORIAS = "/categorias";
+    const API_PRODUTOS = "/produtos";
+
+    // Evita que textos vindos da API sejam interpretados como HTML
+    function esc(valor) {
+        const div = document.createElement("div");
+        div.textContent = valor ?? "";
+        return div.innerHTML;
+    }
+
+    // Faz a requisição e registra método, URL, status e corpo da resposta no painel de log.
+    // registrar = false é usado nas recargas automáticas das tabelas, para não apagar
+    // do painel a resposta da ação que acabou de ser feita (ex: o 204 do DELETE)
+    async function requisitar(metodo, url, corpo, registrar = true) {
+        const opcoes = { method: metodo, headers: {} };
+        if (corpo !== undefined) {
+            opcoes.headers["Content-Type"] = "application/json";
+            opcoes.body = JSON.stringify(corpo);
+        }
+
+        const resposta = await fetch(url, opcoes);
+        const texto = await resposta.text();
+        let dados = null;
+        try { dados = texto ? JSON.parse(texto) : null; } catch { dados = texto; }
+
+        if (registrar) registrarLog(metodo, url, corpo, resposta.status, dados);
+        return { ok: resposta.ok, status: resposta.status, dados };
+    }
+
+    function registrarLog(metodo, url, corpo, status, dados) {
+        const badge = document.getElementById("logStatus");
+        badge.textContent = "HTTP " + status;
+        badge.className = "badge ms-2 " + (status < 400 ? "bg-success" : "bg-danger");
+
+        let texto = metodo + " " + url;
+        if (corpo !== undefined) texto += "\n\nCorpo enviado:\n" + JSON.stringify(corpo, null, 2);
+        const semConteudo = status === 204 ? "(204 No Content: operação realizada, a API não devolve corpo)" : "(sem conteúdo)";
+        texto += "\n\nResposta (" + status + "):\n" + (dados === null ? semConteudo : JSON.stringify(dados, null, 2));
+
+        const log = document.getElementById("log");
+        log.textContent = texto;
+        log.classList.remove("text-muted");
+    }
+
+    function limparLog() {
+        document.getElementById("logStatus").textContent = "";
+        document.getElementById("logStatus").className = "badge bg-secondary ms-2";
+        const log = document.getElementById("log");
+        log.textContent = "Nenhuma requisição ainda.";
+        log.classList.add("text-muted");
+    }
+
+    // Converte o valor de um input numérico; campo vazio vira null para a validação da API atuar
+    function numeroOuNulo(id) {
+        const valor = document.getElementById(id).value;
+        return valor === "" ? null : Number(valor);
+    }
+
+    // ===================== CATEGORIAS =====================
+
+    // 1. Buscar categorias (GET) e preencher tabela e selects
+    async function carregarCategorias(silencioso = false) {
+        const { ok, dados } = await requisitar("GET", API_CATEGORIAS, undefined, !silencioso);
+        if (!ok) return;
+
+        const tabela = document.getElementById("tabelaCategorias");
+        tabela.innerHTML = "";
+        dados.forEach(c => {
+            tabela.innerHTML += `
+                <tr>
+                    <td>${c.id}</td>
+                    <td>${esc(c.nome)}</td>
+                    <td>${esc(c.descricao)}</td>
+                    <td class="text-end text-nowrap">
+                        <button class="btn btn-sm btn-outline-secondary" onclick="editarCategoria(${c.id})">Editar</button>
+                        <button class="btn btn-sm btn-outline-danger" onclick="excluirCategoria(${c.id})">Excluir</button>
+                    </td>
+                </tr>
+            `;
+        });
+        if (dados.length === 0) {
+            tabela.innerHTML = `<tr><td colspan="4" class="text-center text-muted">Nenhuma categoria cadastrada</td></tr>`;
+        }
+
+        preencherSelect("categoriaId", dados, "Selecione...");
+        preencherSelect("filtroCategoria", dados, "Todas as categorias");
+    }
+
+    // Mantém a opção selecionada ao recarregar a lista
+    function preencherSelect(id, categorias, textoPadrao) {
+        const select = document.getElementById(id);
+        const atual = select.value;
+        select.innerHTML = `<option value="">${textoPadrao}</option>`;
+        categorias.forEach(c => {
+            select.innerHTML += `<option value="${c.id}">${esc(c.nome)}</option>`;
+        });
+        select.value = atual;
+    }
+
+    // 2. Cadastrar (POST) ou atualizar (PUT) categoria
+    document.getElementById("formCategoria").addEventListener("submit", async (e) => {
+        e.preventDefault(); // Impede o recarregamento padrão da página
+
+        const id = document.getElementById("categoriaIdEdicao").value;
+        const dto = {
+            nome: document.getElementById("catNome").value,
+            descricao: document.getElementById("catDescricao").value
+        };
+
+        const { ok } = id
+            ? await requisitar("PUT", `${API_CATEGORIAS}/${id}`, dto)
+            : await requisitar("POST", API_CATEGORIAS, dto);
+
+        if (ok) {
+            cancelarEdicaoCategoria();
+            await carregarCategorias(true);
+            carregarProdutos(true); // o nome da categoria aparece na tabela de produtos
+        }
+    });
+
+    // 3. Buscar por ID (GET) e preencher o formulário para edição
+    async function editarCategoria(id) {
+        const { ok, dados } = await requisitar("GET", `${API_CATEGORIAS}/${id}`);
+        if (!ok) return;
+
+        document.getElementById("categoriaIdEdicao").value = dados.id;
+        document.getElementById("catNome").value = dados.nome;
+        document.getElementById("catDescricao").value = dados.descricao;
+        document.getElementById("tituloFormCategoria").textContent = "Editando Categoria #" + dados.id;
+        document.getElementById("btnSalvarCategoria").textContent = "Atualizar Categoria (PUT)";
+        document.getElementById("btnCancelarCategoria").classList.remove("d-none");
+    }
+
+    function cancelarEdicaoCategoria() {
+        document.getElementById("formCategoria").reset();
+        document.getElementById("categoriaIdEdicao").value = "";
+        document.getElementById("tituloFormCategoria").textContent = "Cadastrar Nova Categoria";
+        document.getElementById("btnSalvarCategoria").textContent = "Salvar Categoria (POST)";
+        document.getElementById("btnCancelarCategoria").classList.add("d-none");
+    }
+
+    // 4. Excluir categoria (DELETE)
+    async function excluirCategoria(id) {
+        if (!confirm("Excluir a categoria #" + id + "?")) return;
+        const { ok } = await requisitar("DELETE", `${API_CATEGORIAS}/${id}`);
+        if (ok) carregarCategorias(true);
+    }
+
+    // ===================== PRODUTOS =====================
+
+    // 5. Buscar produtos (GET) aplicando os filtros de categoria e nome
+    async function carregarProdutos(silencioso = false) {
+        const params = new URLSearchParams();
+        const categoria = document.getElementById("filtroCategoria").value;
+        const nome = document.getElementById("filtroNome").value.trim();
+        if (categoria) params.append("categoriaId", categoria);
+        if (nome) params.append("nome", nome);
+
+        const url = params.toString() ? `${API_PRODUTOS}?${params}` : API_PRODUTOS;
+        const { ok, dados } = await requisitar("GET", url, undefined, !silencioso);
+        if (!ok) return;
+
+        const tabela = document.getElementById("tabelaProdutos");
+        tabela.innerHTML = "";
+        dados.forEach(p => {
+            tabela.innerHTML += `
+                <tr>
+                    <td>${p.id}</td>
+                    <td>${esc(p.nome)}<br><small class="text-muted">${esc(p.descricao)}</small></td>
+                    <td>${esc(p.categoriaNome)}</td>
+                    <td>R$ ${p.preco.toFixed(2)}</td>
+                    <td><strong>${p.quantidadeEstoque}</strong></td>
+                    <td class="text-nowrap">
+                        <input type="number" min="1" value="1" id="mov-${p.id}"
+                               class="form-control form-control-sm d-inline-block estoque-input">
+                        <button class="btn btn-sm btn-outline-success" onclick="movimentarEstoque(${p.id}, 'ENTRADA')">+ Entrada</button>
+                        <button class="btn btn-sm btn-outline-warning" onclick="movimentarEstoque(${p.id}, 'SAIDA')">− Saída</button>
+                    </td>
+                    <td class="text-end text-nowrap">
+                        <button class="btn btn-sm btn-outline-secondary" onclick="editarProduto(${p.id})">Editar</button>
+                        <button class="btn btn-sm btn-outline-danger" onclick="excluirProduto(${p.id})">Excluir</button>
+                    </td>
+                </tr>
+            `;
+        });
+        if (dados.length === 0) {
+            tabela.innerHTML = `<tr><td colspan="7" class="text-center text-muted">Nenhum produto encontrado</td></tr>`;
+        }
+    }
+
+    document.getElementById("formFiltro").addEventListener("submit", (e) => {
+        e.preventDefault();
+        carregarProdutos();
+    });
+
+    // 6. Cadastrar (POST) ou atualizar (PUT) produto
+    document.getElementById("formProduto").addEventListener("submit", async (e) => {
+        e.preventDefault(); // Impede o recarregamento padrão da página
+
+        const id = document.getElementById("produtoIdEdicao").value;
+        const dto = {
+            nome: document.getElementById("nome").value,
+            descricao: document.getElementById("descricao").value,
+            preco: numeroOuNulo("preco"),
+            quantidadeEstoque: numeroOuNulo("quantidadeEstoque"),
+            categoriaId: numeroOuNulo("categoriaId")
+        };
+
+        const { ok } = id
+            ? await requisitar("PUT", `${API_PRODUTOS}/${id}`, dto)
+            : await requisitar("POST", API_PRODUTOS, dto);
+
+        if (ok) {
+            cancelarEdicaoProduto();
+            carregarProdutos(true);
+        }
+    });
+
+    // 7. Buscar produto por ID (GET) e preencher o formulário para edição
+    async function editarProduto(id) {
+        const { ok, dados } = await requisitar("GET", `${API_PRODUTOS}/${id}`);
+        if (!ok) return;
+
+        document.getElementById("produtoIdEdicao").value = dados.id;
+        document.getElementById("nome").value = dados.nome;
+        document.getElementById("descricao").value = dados.descricao;
+        document.getElementById("preco").value = dados.preco;
+        document.getElementById("quantidadeEstoque").value = dados.quantidadeEstoque;
+        document.getElementById("categoriaId").value = dados.categoriaId;
+        document.getElementById("tituloFormProduto").textContent = "Editando Produto #" + dados.id;
+        document.getElementById("btnSalvarProduto").textContent = "Atualizar Produto (PUT)";
+        document.getElementById("btnCancelarProduto").classList.remove("d-none");
+    }
+
+    function cancelarEdicaoProduto() {
+        document.getElementById("formProduto").reset();
+        document.getElementById("produtoIdEdicao").value = "";
+        document.getElementById("tituloFormProduto").textContent = "Cadastrar Novo Produto";
+        document.getElementById("btnSalvarProduto").textContent = "Salvar Produto (POST)";
+        document.getElementById("btnCancelarProduto").classList.add("d-none");
+    }
+
+    // 8. Movimentar estoque (PATCH) com ENTRADA ou SAIDA
+    async function movimentarEstoque(id, tipo) {
+        const dto = { tipo, quantidade: numeroOuNulo("mov-" + id) };
+        const { ok } = await requisitar("PATCH", `${API_PRODUTOS}/${id}/estoque`, dto);
+        if (ok) carregarProdutos(true);
+    }
+
+    // 9. Excluir produto (DELETE)
+    async function excluirProduto(id) {
+        if (!confirm("Excluir o produto #" + id + "?")) return;
+        const { ok } = await requisitar("DELETE", `${API_PRODUTOS}/${id}`);
+        if (ok) carregarProdutos(true);
+    }
+
+    // Carrega as listas assim que a página abre
+    carregarCategorias().then(carregarProdutos);
+</script>
+</body>
+</html>
