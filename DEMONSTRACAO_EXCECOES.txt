@@ -1,0 +1,171 @@
+======================================================================
+ DEMONSTRAÇÃO DO TRATAMENTO DE EXCEÇÕES - API DE PRODUTOS E ESTOQUE
+======================================================================
+
+Todas as requisições abaixo devem ser enviadas pelo Postman com a
+aplicação rodando (http://localhost:8080) e o MySQL ligado.
+
+Quando houver corpo (body): aba Body > raw > JSON, e cole o JSON.
+
+IMPORTANTE: um INSERT feito direto no MySQL NÃO passa pela API, então
+não aciona o tratamento de exceções. A demonstração precisa ser feita
+pelas requisições HTTP abaixo.
+
+Dois formatos de resposta de erro:
+  - Erros de validação (seção 1): um mapa "campo": "mensagem"
+  - Demais erros: formato padrão ErroResposta, com os campos
+    status, error, mensagem e timestamp
+
+
+----------------------------------------------------------------------
+ PREPARAÇÃO
+----------------------------------------------------------------------
+
+Crie uma categoria e um produto com pouco estoque. Anote o "id" que
+volta em cada resposta: ele substitui ID_CATEGORIA e ID_PRODUTO nos
+casos seguintes.
+
+POST  http://localhost:8080/categorias
+{ "nome": "Demonstração", "descricao": "Categoria para apresentar os erros" }
+
+POST  http://localhost:8080/produtos
+{ "nome": "Cabo HDMI", "descricao": "2 metros", "preco": 39.90, "quantidadeEstoque": 3, "categoriaId": ID_CATEGORIA }
+
+
+----------------------------------------------------------------------
+ 1. VALIDAÇÃO DOS DTOs (Bean Validation) -> 400 Bad Request
+    Exceção tratada: MethodArgumentNotValidException
+----------------------------------------------------------------------
+
+1.1 Campos em branco (@NotBlank)
+    POST  http://localhost:8080/categorias
+    { "nome": "", "descricao": "" }
+
+    Resposta:
+    {"nome":"O nome é obrigatório","descricao":"A descrição é obrigatória"}
+
+1.2 Texto maior que o permitido (@Size(max = 50))
+    POST  http://localhost:8080/categorias
+    { "nome": "Categoria com um nome muito grande que passa de cinquenta caracteres", "descricao": "ok" }
+
+    Resposta:
+    {"nome":"O nome não pode passar de 50 caracteres"}
+
+1.3 Preço zero e estoque negativo (@Positive e @Min(0))
+    POST  http://localhost:8080/produtos
+    { "nome": "Mouse", "descricao": "Sem fio", "preco": 0, "quantidadeEstoque": -5, "categoriaId": ID_CATEGORIA }
+
+    Resposta:
+    {"preco":"O preço deve ser maior que zero","quantidadeEstoque":"A quantidade não pode ser negativa"}
+
+1.4 Campos obrigatórios ausentes (@NotNull)
+    POST  http://localhost:8080/produtos
+    { "nome": "Mouse", "descricao": "Sem fio", "preco": 50 }
+
+    Resposta:
+    {"quantidadeEstoque":"A quantidade é obrigatória","categoriaId":"A categoria é obrigatória"}
+
+1.5 Quantidade zero na movimentação (@Min(1))
+    PATCH  http://localhost:8080/produtos/ID_PRODUTO/estoque
+    { "tipo": "ENTRADA", "quantidade": 0 }
+
+    Resposta:
+    {"quantidade":"A quantidade deve ser maior que zero"}
+
+
+----------------------------------------------------------------------
+ 2. RECURSO NÃO ENCONTRADO -> 404 Not Found
+    Exceção tratada: ResourceNotFoundException (lançada no service)
+----------------------------------------------------------------------
+
+2.1 Produto com categoria inexistente
+    POST  http://localhost:8080/produtos
+    { "nome": "Mouse", "descricao": "Sem fio", "preco": 50, "quantidadeEstoque": 1, "categoriaId": 99999 }
+
+    Resposta:
+    "mensagem": "Categoria não encontrada com o id: 99999"
+
+2.2 Produto inexistente
+    GET  http://localhost:8080/produtos/99999
+
+    Resposta:
+    "mensagem": "Produto não encontrado com o id: 99999"
+
+
+----------------------------------------------------------------------
+ 3. REGRA DE NEGÓCIO -> 400 Bad Request
+    Exceção tratada: RegraNegocioException
+----------------------------------------------------------------------
+
+3.1 Saída maior que o estoque (o produto tem 3 unidades)
+    PATCH  http://localhost:8080/produtos/ID_PRODUTO/estoque
+    { "tipo": "SAIDA", "quantidade": 10 }
+
+    Resposta:
+    "error": "Regra de Negócio"
+    "mensagem": "Estoque insuficiente. Disponível: 3, solicitado: 10"
+
+3.2 Excluir categoria que tem produtos
+    DELETE  http://localhost:8080/categorias/ID_CATEGORIA
+
+    Resposta:
+    "mensagem": "Não é possível excluir a categoria pois existem produtos vinculados a ela"
+
+
+----------------------------------------------------------------------
+ 4. REQUISIÇÃO MALFORMADA -> 400 Bad Request
+    Exceção tratada: HttpMessageNotReadableException
+    (o JSON não pôde ser lido)
+----------------------------------------------------------------------
+
+4.1 JSON quebrado (faltou fechar a string e a chave)
+    POST  http://localhost:8080/categorias
+    { "nome": "Informática", "descricao": "faltou fechar
+
+4.2 Texto no lugar de número
+    POST  http://localhost:8080/produtos
+    { "nome": "Mouse", "descricao": "Sem fio", "preco": "cinquenta", "quantidadeEstoque": 1, "categoriaId": ID_CATEGORIA }
+
+4.3 Valor que não existe no enum (só aceita ENTRADA ou SAIDA)
+    PATCH  http://localhost:8080/produtos/ID_PRODUTO/estoque
+    { "tipo": "TRANSFERENCIA", "quantidade": 1 }
+
+    Resposta dos três casos:
+    "mensagem": "O corpo da requisição está malformado ou contém valores inválidos"
+
+
+----------------------------------------------------------------------
+ 5. ERROS DE ROTA E DE PARÂMETRO
+----------------------------------------------------------------------
+
+5.1 ID em formato de texto -> 400 Bad Request
+    Exceção tratada: MethodArgumentTypeMismatchException
+    GET  http://localhost:8080/produtos/abc
+
+    Resposta:
+    "mensagem": "Valor inválido para o parâmetro 'id': abc"
+
+5.2 Verbo HTTP não suportado -> 405 Method Not Allowed
+    Exceção tratada: HttpRequestMethodNotSupportedException
+    PATCH  http://localhost:8080/categorias/ID_CATEGORIA   (sem body)
+
+    Resposta:
+    "mensagem": "O método PATCH não é suportado neste endpoint"
+
+5.3 Rota inexistente -> 404 Not Found
+    Exceção tratada: NoResourceFoundException
+    GET  http://localhost:8080/estoque
+
+    Resposta:
+    "mensagem": "Endpoint não encontrado: /estoque"
+
+
+----------------------------------------------------------------------
+ AO FINAL: DESFAZER A DEMONSTRAÇÃO
+----------------------------------------------------------------------
+
+DELETE  http://localhost:8080/produtos/ID_PRODUTO       -> 204 No Content
+DELETE  http://localhost:8080/categorias/ID_CATEGORIA   -> 204 No Content
+
+(A categoria só pode ser excluída depois do produto, por causa da
+regra do item 3.2.)
